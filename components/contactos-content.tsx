@@ -16,7 +16,9 @@ export default function ContactosContent() {
 
   const showContent = (id: ContentId, event: React.MouseEvent) => {
     event.stopPropagation()
-    setActiveContent(activeContent === id ? null : id)
+    // Si ya está activo, no hacer nada para mantenerlo abierto
+    if (activeContent === id) return
+    setActiveContent(id)
   }
 
   const closeContent = (event: React.MouseEvent) => {

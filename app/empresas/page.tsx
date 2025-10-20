@@ -34,7 +34,10 @@ export default function EmpresasPage() {
       <div
         className="page-background"
         style={{
-          backgroundImage: "url(/placeholder.svg?height=1080&width=1920&query=amanecer+carretera+colombia)",
+          backgroundImage: "url(/amanecer.webp)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
         }}
       />
 

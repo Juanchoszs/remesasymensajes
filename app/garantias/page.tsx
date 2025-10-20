@@ -1,14 +1,18 @@
 import GarantiasContent from "@/components/garantias-content"
+import Background from '@/app/servicios/Background';
 
 export const metadata = {
-  title: "Remesas y Mensajes LTDA | Garantías del Servicio",
+  title: "Remesas y Mensajes LTDA | Servicios",
 }
 
 export default function GarantiasPage() {
   return (
-    <div style={{ backgroundImage: "url(/placeholder.svg?height=1080&width=1920&query=carretera colombia paisaje)" }}>
-      {/* BACKGROUND IMAGE: static/img/fondos/Carretera.webp */}
-      <GarantiasContent />
+    <div className="min-h-screen w-full relative">
+      <Background />
+      <div className="relative z-10">
+        <GarantiasContent />
+      </div>
     </div>
   )
 }
+

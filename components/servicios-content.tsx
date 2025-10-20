@@ -15,18 +15,37 @@ type SubContent =
   | "subcontenido9";
 
 export default function ServiciosContent() {
-  const [activeMainContent, setActiveMainContent] = useState<MainContent | null>(null);
-  const [activeSubContent, setActiveSubContent] = useState<SubContent | null>(null);
+  const [activeMainContent, setActiveMainContent] = useState<MainContent | null>('contenido1');
+  const [activeSubContent, setActiveSubContent] = useState<SubContent | null>('subcontenido1'); // Por defecto: Almacenamiento
 
   const showMainContent = (id: MainContent, event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    setActiveMainContent(activeMainContent === id ? null : id);
-    setActiveSubContent(null);
+    // Si ya está activo, no hacer nada para mantenerlo abierto
+    if (activeMainContent === id) return;
+    
+    // Establecer el subcontenido por defecto según la sección principal
+    let defaultSubContent: SubContent | null = null;
+    switch(id) {
+      case 'contenido1': // Métodos
+        defaultSubContent = 'subcontenido1'; // Almacenamiento
+        break;
+      case 'contenido2': // Cantidades
+        defaultSubContent = 'subcontenido4'; // Paqueteo
+        break;
+      case 'contenido3': // PL's
+        defaultSubContent = 'subcontenido7'; // 2-PL
+        break;
+    }
+    
+    setActiveMainContent(id);
+    setActiveSubContent(defaultSubContent);
   };
 
   const showSubContent = (id: SubContent, event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    setActiveSubContent(activeSubContent === id ? null : id);
+    // Si ya está activo, no hacer nada para mantenerlo abierto
+    if (activeSubContent === id) return;
+    setActiveSubContent(id);
   };
 
   const closeContent = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -103,41 +122,57 @@ export default function ServiciosContent() {
   const cardStyle: React.CSSProperties = {
     maxWidth: "900px",
     margin: "0 auto",
-    padding: "1.6rem",
-    background: "linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.6))",
-    borderRadius: "14px",
-    backdropFilter: "blur(8px)",
-    boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
-    color: "#f6f6f6",
+    padding: "2rem",
+    background: "linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.65))",
+    borderRadius: "16px",
+    backdropFilter: "blur(10px)",
+    boxShadow: "0 12px 35px rgba(0,0,0,0.5)",
+    color: "#f8f9fa",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
   };
 
   const headingStyle: React.CSSProperties = {
-    fontSize: "1.6rem",
-    marginBottom: "0.75rem",
+    fontSize: "1.8rem",
+    marginBottom: "1.5rem",
     textAlign: "center" as const,
-    fontWeight: 700,
+    fontWeight: 800,
+    color: "#ffffff",
+    textShadow: "0 2px 4px rgba(0,0,0,0.3)",
+    letterSpacing: "0.5px",
   };
 
   const ulStyle: React.CSSProperties = {
     listStyle: "none",
-    paddingLeft: 0,
-    lineHeight: 1.7,
-    fontSize: "1rem",
-    margin: 0,
+    paddingLeft: "1rem",
+    lineHeight: 1.8,
+    fontSize: "1.1rem",
+    margin: "1.5rem 0",
   };
 
   const liStyle: React.CSSProperties = {
-    marginBottom: "0.5rem",
-    paddingLeft: "0.6rem",
+    marginBottom: "0.8rem",
+    paddingLeft: "1.8rem",
     position: "relative" as const,
+    transition: "all 0.2s ease",
   };
 
   const bulletStyle: React.CSSProperties = {
     position: "absolute" as const,
     left: 0,
-    top: 3,
+    top: 5,
     color: "#8fd3c7",
+    fontWeight: 800,
+    fontSize: "1.4rem",
+  };
+
+  const sectionTitleStyle: React.CSSProperties = {
+    margin: "1.5rem 0",
     fontWeight: 700,
+    fontSize: "1.5rem",
+    color: "#e9ecef",
+    paddingBottom: "0.5rem",
+    borderBottom: "2px solid rgba(255, 255, 255, 0.1)",
+    textShadow: "0 1px 2px rgba(0,0,0,0.2)"
   };
 
   // Contenidos textuales
@@ -297,7 +332,7 @@ export default function ServiciosContent() {
             <div>
               {activeSubContent === "subcontenido1" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — Almacenamiento</h4>
+                  <h4 style={sectionTitleStyle}>Características — Almacenamiento</h4>
                   <ul style={ulStyle}>
                     {almacenText.map((t, i) => (
                       <li key={i} style={liStyle}>
@@ -311,7 +346,7 @@ export default function ServiciosContent() {
 
               {activeSubContent === "subcontenido2" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — Transporte</h4>
+                  <h4 style={sectionTitleStyle}>Características — Transporte</h4>
                   <ul style={ulStyle}>
                     {transporteText.map((t, i) => (
                       <li key={i} style={liStyle}>
@@ -325,7 +360,7 @@ export default function ServiciosContent() {
 
               {activeSubContent === "subcontenido3" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — Distribución</h4>
+                  <h4 style={sectionTitleStyle}>Características — Distribución</h4>
                   <ul style={ulStyle}>
                     {distribucionText.map((t, i) => (
                       <li key={i} style={liStyle}>
@@ -389,7 +424,7 @@ export default function ServiciosContent() {
             <div>
               {activeSubContent === "subcontenido4" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — Paqueteo</h4>
+                  <h4 style={sectionTitleStyle}>Características — Paqueteo</h4>
                   <ul style={ulStyle}>
                     {paqueteoText.map((t, i) => (
                       <li key={i} style={liStyle}>
@@ -403,7 +438,7 @@ export default function ServiciosContent() {
 
               {activeSubContent === "subcontenido5" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — Semimasivo</h4>
+                  <h4 style={sectionTitleStyle}>Características — Semimasivo</h4>
                   <ul style={ulStyle}>
                     {semimasivoText.map((t, i) => (
                       <li key={i} style={liStyle}>
@@ -417,7 +452,7 @@ export default function ServiciosContent() {
 
               {activeSubContent === "subcontenido6" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — Masivo</h4>
+                  <h4 style={sectionTitleStyle}>Características — Masivo</h4>
                   <ul style={ulStyle}>
                     {masivoText.map((t, i) => (
                       <li key={i} style={liStyle}>
@@ -479,7 +514,7 @@ export default function ServiciosContent() {
             <div>
               {activeSubContent === "subcontenido7" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — 2-PL</h4>
+                  <h4 style={sectionTitleStyle}>Características — 2-PL</h4>
                   <ul style={ulStyle}>
                     <li style={liStyle}><span style={bulletStyle}>°</span><span style={{ marginLeft: 18 }}>Transporte de mercancías</span></li>
                     <li style={liStyle}><span style={bulletStyle}>°</span><span style={{ marginLeft: 18 }}>Operación exclusiva o consolidada</span></li>
@@ -498,7 +533,7 @@ export default function ServiciosContent() {
 
               {activeSubContent === "subcontenido8" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — 3-PL</h4>
+                  <h4 style={sectionTitleStyle}>Características — 3-PL</h4>
                   <ul style={ulStyle}>
                     <li style={liStyle}><span style={bulletStyle}>°</span><span style={{ marginLeft: 18 }}>Gestión en almacenaje de mercancías</span></li>
                     <li style={liStyle}><span style={bulletStyle}>°</span><span style={{ marginLeft: 18 }}>Operación exclusiva o compartida</span></li>
@@ -515,7 +550,7 @@ export default function ServiciosContent() {
 
               {activeSubContent === "subcontenido9" && (
                 <article style={{ marginTop: "0.4rem" }}>
-                  <h4 style={{ marginBottom: "0.6rem", fontWeight: 700 }}>Características — 4-PL</h4>
+                  <h4 style={sectionTitleStyle}>Características — 4-PL</h4>
                   <ul style={ulStyle}>
                     <li style={liStyle}><span style={bulletStyle}>°</span><span style={{ marginLeft: 18 }}>Almacén y distribución integrados</span></li>
                     <li style={liStyle}><span style={bulletStyle}>°</span><span style={{ marginLeft: 18 }}>Operación exclusiva o compartida</span></li>
