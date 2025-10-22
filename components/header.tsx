@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Logo from "./logo"
 import MobileMenu from "./mobile-menu"
+import DesktopSidebar from "./desktop-sidebar"
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -27,9 +28,17 @@ export default function Header() {
                 </a>
               </li>
               <li>
-                <a href="#" className="menu-toggle" onClick={toggleMenu}>
+                <button
+                  type="button"
+                  className="menu-toggle"
+                  aria-label="Abrir menú"
+                  aria-expanded={menuOpen}
+                  aria-controls="mobile-menu desktop-sidebar"
+                  onClick={toggleMenu}
+                  style={{ background: "transparent", border: 0, cursor: "pointer" }}
+                >
                   ☰
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -48,13 +57,22 @@ export default function Header() {
                 <Link href="/nosotros">Nosotros</Link>
               </li>
               <li>
-                <a href="#" className="menu-toggle" onClick={toggleMenu}>
+                <button
+                  type="button"
+                  className="menu-toggle"
+                  aria-label="Abrir menú"
+                  aria-expanded={menuOpen}
+                  aria-controls="mobile-menu desktop-sidebar"
+                  onClick={toggleMenu}
+                  style={{ background: "transparent", border: 0, cursor: "pointer" }}
+                >
                   ☰
-                </a>
+                </button>
               </li>
             </ul>
           </nav>
           <MobileMenu isOpen={menuOpen} onClose={closeMenu} />
+          <DesktopSidebar isOpen={menuOpen} onClose={closeMenu} />
         </div>
       </div>
     </header>

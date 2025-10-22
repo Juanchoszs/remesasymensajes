@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
+import { toast } from "sonner"
 
 type ContentId =
   | "contenido-w4"
@@ -13,6 +14,15 @@ type ContentId =
 export default function ContactosContent() {
   // 🔹 Estado inicial con Arauca abierto
   const [activeContent, setActiveContent] = useState<ContentId | null>("contenido-w4")
+  
+  // Estados para el formulario PQRS
+  const [formData, setFormData] = useState({
+    nombre: "",
+    correo: "",
+    asunto: "",
+    mensaje: ""
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const showContent = (id: ContentId, event: React.MouseEvent) => {
     event.stopPropagation()
@@ -25,6 +35,65 @@ export default function ContactosContent() {
     const target = event.target as HTMLElement
     if (target.classList.contains("caja-w")) {
       setActiveContent(null)
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const handleSubmitPQRS = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (isSubmitting) return
+    
+    setIsSubmitting(true)
+    const loadingToast = toast.loading("Enviando tu PQRS...")
+    
+    try {
+      const response = await fetch("/api/send-pqrs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        toast.success("¡PQRS enviada exitosamente!", {
+          description: "Te responderemos en un plazo máximo de 15 días hábiles.",
+          duration: 5000,
+          id: loadingToast,
+        })
+        
+        // Limpiar el formulario
+        setFormData({
+          nombre: "",
+          correo: "",
+          asunto: "",
+          mensaje: ""
+        })
+      } else {
+        toast.error("Error al enviar la PQRS", {
+          description: result.error || "Por favor intenta nuevamente.",
+          duration: 5000,
+          id: loadingToast,
+        })
+      }
+    } catch (error) {
+      console.error("Error:", error)
+      toast.error("Error de conexión", {
+        description: "No se pudo conectar con el servidor. Verifica tu conexión a internet.",
+        duration: 5000,
+        id: loadingToast,
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -220,8 +289,7 @@ export default function ContactosContent() {
           <h2 style={{ ...titleStyle, fontSize: "2.3rem" }}>PQR's</h2>
           <form
             className="form-contacto"
-            action="https://formsubmit.co/yorland1998@gmail.com"
-            method="POST"
+            onSubmit={handleSubmitPQRS}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -234,9 +302,11 @@ export default function ContactosContent() {
             </label>
             <input
               type="text"
-              name="Nombre"
+              name="nombre"
               id="name"
               placeholder="Nombre completo"
+              value={formData.nombre}
+              onChange={handleInputChange}
               required
               style={{
                 padding: "1rem",
@@ -253,9 +323,11 @@ export default function ContactosContent() {
             </label>
             <input
               type="email"
-              name="Correo Electrónico"
+              name="correo"
               id="email"
               placeholder="Correo Electrónico"
+              value={formData.correo}
+              onChange={handleInputChange}
               required
               style={{
                 padding: "1rem",
@@ -272,9 +344,11 @@ export default function ContactosContent() {
             </label>
             <input
               type="text"
-              name="Asunto"
+              name="asunto"
               id="subject"
               placeholder="(Petición, queja o reclamo)"
+              value={formData.asunto}
+              onChange={handleInputChange}
               required
               style={{
                 padding: "1rem",
@@ -290,11 +364,13 @@ export default function ContactosContent() {
               PQR:
             </label>
             <textarea
-              name="PQR's"
+              name="mensaje"
               id="coments"
               cols={30}
-              rows={8} // 🔹 más grande
+              rows={8}
               placeholder="Escribe tu Petición, queja o reclamo"
+              value={formData.mensaje}
+              onChange={handleInputChange}
               required
               style={{
                 padding: "1rem",
@@ -307,10 +383,10 @@ export default function ContactosContent() {
               }}
             ></textarea>
 
-            <input
+            <button
               className="btn"
               type="submit"
-              value="ENVIAR"
+              disabled={isSubmitting}
               style={{
                 padding: "1rem",
                 borderRadius: "10px",
@@ -318,25 +394,25 @@ export default function ContactosContent() {
                 color: "#fff",
                 fontWeight: 700,
                 fontSize: "1.1rem",
-                cursor: "pointer",
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+                opacity: isSubmitting ? 0.7 : 1,
                 transition: "transform 0.3s ease, opacity 0.3s ease",
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)"
-                e.currentTarget.style.opacity = "0.9"
+                if (!isSubmitting) {
+                  e.currentTarget.style.transform = "scale(1.05)"
+                  e.currentTarget.style.opacity = "0.9"
+                }
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.transform = "scale(1)"
-                e.currentTarget.style.opacity = "1"
+                if (!isSubmitting) {
+                  e.currentTarget.style.transform = "scale(1)"
+                  e.currentTarget.style.opacity = "1"
+                }
               }}
-            />
-
-            <input
-              type="hidden"
-              name="_next"
-              value="https://yorland98.github.io/Remesas_Mensajes/"
-            />
-            <input type="hidden" name="_captcha" value="false" />
+            >
+              {isSubmitting ? "ENVIANDO..." : "ENVIAR"}
+            </button>
           </form>
         </div>
       )}

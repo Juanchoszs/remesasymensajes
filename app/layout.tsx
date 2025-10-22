@@ -4,6 +4,7 @@ import "./globals.css"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import SuperTransporteIcon from "@/components/super-transporte-icon"
+import { Toaster } from "sonner"
 
 export const metadata: Metadata = {
   title: "Remesas y Mensajes LTDA.",
@@ -29,6 +30,7 @@ export default function RootLayout({
           <SuperTransporteIcon />
           <Footer />
         </div>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   )

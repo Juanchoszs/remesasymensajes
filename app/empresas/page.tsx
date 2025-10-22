@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { toast } from "sonner"
 
 export default function EmpresasPage() {
   const [formData, setFormData] = useState({
@@ -15,10 +16,67 @@ export default function EmpresasPage() {
     comentarios: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form data:", formData)
-    alert("Formulario enviado. Configuración de envío pendiente.")
+    
+    // Prevenir múltiples envíos
+    if (isSubmitting) return
+    
+    setIsSubmitting(true)
+    
+    // Mostrar toast de carga
+    const loadingToast = toast.loading("Enviando tu solicitud...")
+    
+    try {
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.success) {
+        // Éxito
+        toast.success("¡Solicitud enviada exitosamente!", {
+          description: "Nos pondremos en contacto contigo pronto.",
+          duration: 5000,
+          id: loadingToast,
+        })
+        
+        // Limpiar el formulario
+        setFormData({
+          nombreEmpresa: "",
+          correo: "",
+          objetoSocial: "",
+          tipoMercancia: "",
+          capacidadAlmacenamiento: "",
+          frecuenciaEnvio: "",
+          comentarios: "",
+        })
+      } else {
+        // Error del servidor
+        toast.error("Error al enviar la solicitud", {
+          description: result.error || "Por favor intenta nuevamente.",
+          duration: 5000,
+          id: loadingToast,
+        })
+      }
+    } catch (error) {
+      // Error de conexión
+      console.error("Error:", error)
+      toast.error("Error de conexión", {
+        description: "No se pudo conectar con el servidor. Verifica tu conexión a internet.",
+        duration: 5000,
+        id: loadingToast,
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -161,8 +219,16 @@ export default function EmpresasPage() {
               />
             </div>
 
-            <button type="submit" className="btn-submit-empresarial">
-              Enviar
+            <button 
+              type="submit" 
+              className="btn-submit-empresarial"
+              disabled={isSubmitting}
+              style={{
+                opacity: isSubmitting ? 0.7 : 1,
+                cursor: isSubmitting ? "not-allowed" : "pointer"
+              }}
+            >
+              {isSubmitting ? "Enviando..." : "Enviar"}
             </button>
           </form>
         </div>
