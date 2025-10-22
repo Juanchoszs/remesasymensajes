@@ -1,4 +1,5 @@
 import ServiciosContent from "@/components/servicios-content"
+import Footer from "@/components/footer"
 import Background from './Background';
 
 export const metadata = {
@@ -7,10 +8,20 @@ export const metadata = {
 
 export default function ServiciosPage() {
   return (
-    <div className="min-h-screen w-full relative">
-      <Background />
-      <div className="relative z-10">
+    <div className="relative min-h-screen w-full flex flex-col overflow-x-hidden">
+      {/* Fondo con z-index más bajo */}
+      <div className="fixed inset-0 -z-10">
+        <Background />
+      </div>
+      
+      {/* Contenido principal */}
+      <div className="relative z-10 flex-grow pt-[5vh] pb-[25vh] md:pb-[15vh] lg:pb-[10vh]">
         <ServiciosContent />
+      </div>
+      
+      {/* Footer fijo */}
+      <div className="relative z-20 w-full">
+        <Footer />
       </div>
     </div>
   )

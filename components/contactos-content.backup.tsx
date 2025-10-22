@@ -146,24 +146,11 @@ export default function ContactosContent() {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
-        padding: "5rem 1rem 8rem 1rem", /* Ajustado padding superior e inferior */
+        padding: "3rem 1rem",
         minHeight: "100vh",
         color: "#fff",
-        boxSizing: "border-box",
-        position: "relative",
       }}
     >
-      <div style={{
-        position: 'relative',
-        zIndex: 2,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        borderRadius: '12px',
-        padding: '1.5rem',
-        marginTop: '1rem',
-        marginBottom: '2rem', /* Añadido margen inferior */
-        backdropFilter: 'blur(5px)',
-        overflow: 'hidden' /* Asegura que el contenido no se desborde */
-      }}>
       {/* === BOTONES DE UBICACIONES === */}
       <div
         className="opciones-w"
@@ -298,9 +285,16 @@ export default function ContactosContent() {
             maxWidth: "850px",
           }}
         >
-          <form onSubmit={handleSubmitPQRS} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <h2 style={titleStyle}>PQR's</h2>
-            <p style={textStyle}>Por favor completa el siguiente formulario</p>
+          {[
+            { id: "contenido-w4", label: "Arauca" },
+            { id: "contenido-w5", label: "Bogotá" },
+            { id: "contenido-w6", label: "Envigado" },
+            { id: "contenido-w7", label: "Villavicencio" },
+            { id: "contenido-w8", label: "Yopal" },
+            { id: "contenido-w9", label: "PQR's" },
+          ].map(({ id, label }) => (
+            }}
+          >
             <label htmlFor="name" style={{ color: "#fff", fontWeight: 500 }}>
               Nombre:
             </label>
@@ -420,7 +414,6 @@ export default function ContactosContent() {
           </form>
         </div>
       )}
-      </div>
     </div>
   )
 }

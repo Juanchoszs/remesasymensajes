@@ -1,20 +1,17 @@
 'use client';
 
-import { useEffect } from 'react';
-
 export default function Background() {
-  useEffect(() => {
-    document.body.classList.add('contact-page');
-    return () => {
-      document.body.classList.remove('contact-page');
-    };
-  }, []);
-
   return (
     <div 
-      className="contact-bg"
+      className="fixed inset-0 -z-10"
       style={{
-        backgroundImage: 'url(/creciente.webp)'
+        backgroundImage: 'url(/creciente.webp)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+        minHeight: '100vh',
+        width: '100%',
       }}
     />
   );
