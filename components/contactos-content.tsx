@@ -99,17 +99,16 @@ export default function ContactosContent() {
 
   const contentStyle: React.CSSProperties = {
     maxWidth: "700px",
+    width: "100%",
     margin: "0 auto",
     padding: "1.5rem",
     background: "rgba(0, 0, 0, 0.6)",
     borderRadius: "12px",
     backdropFilter: "blur(10px)",
-    transform: "scale(0.9)",
-    transformOrigin: "top center",
-    marginTop: "-2,7rem",
-    marginBottom: "-3rem",
     boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
     transition: "all 0.3s ease",
+    overflow: "visible",
+    boxSizing: "border-box"
   }
 
   const titleStyle: React.CSSProperties = {
@@ -142,27 +141,27 @@ export default function ContactosContent() {
       className="caja-w"
       onClick={closeContent}
       style={{
-        backgroundImage: "url('/creciente.webp')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-        padding: "5rem 1rem 8rem 1rem", /* Ajustado padding superior e inferior */
+        padding: "5rem 1rem 8rem 1rem",
         minHeight: "100vh",
         color: "#fff",
         boxSizing: "border-box",
         position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        width: "100%"
       }}
     >
       <div style={{
         position: 'relative',
         zIndex: 2,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
         borderRadius: '12px',
         padding: '1.5rem',
-        marginTop: '1rem',
-        marginBottom: '2rem', /* Añadido margen inferior */
-        backdropFilter: 'blur(5px)',
-        overflow: 'hidden' /* Asegura que el contenido no se desborde */
+        margin: '1rem auto 2rem',
+        maxWidth: '1200px',
+        width: '100%',
+        boxSizing: 'border-box',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
       }}>
       {/* === BOTONES DE UBICACIONES === */}
       <div
@@ -172,9 +171,11 @@ export default function ContactosContent() {
           flexWrap: "wrap",
           gap: "1rem",
           justifyContent: "center",
-          marginBottom: "2rem",
-          maxWidth: "1200px",
           margin: "0 auto 2rem",
+          maxWidth: "1200px",
+          width: "100%",
+          padding: "0 1rem",
+          boxSizing: "border-box"
         }}
       >
         {[
@@ -296,9 +297,23 @@ export default function ContactosContent() {
           style={{
             ...contentStyle,
             maxWidth: "850px",
+            width: "100%",
+            padding: "1.5rem",
+            margin: "0 auto",
+            overflow: "visible"
           }}
         >
-          <form onSubmit={handleSubmitPQRS} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form 
+            onSubmit={handleSubmitPQRS} 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '1rem',
+              width: '100%',
+              maxWidth: '100%',
+              boxSizing: 'border-box'
+            }}
+          >
             <h2 style={titleStyle}>PQR's</h2>
             <p style={textStyle}>Por favor completa el siguiente formulario</p>
             <label htmlFor="name" style={{ color: "#fff", fontWeight: 500 }}>
@@ -319,6 +334,9 @@ export default function ContactosContent() {
                 background: "rgba(255,255,255,0.1)",
                 color: "#fff",
                 fontSize: "1rem",
+                width: "100%",
+                boxSizing: "border-box",
+                WebkitAppearance: "none"
               }}
             />
 
@@ -340,6 +358,9 @@ export default function ContactosContent() {
                 background: "rgba(255,255,255,0.1)",
                 color: "#fff",
                 fontSize: "1rem",
+                width: "100%",
+                boxSizing: "border-box",
+                WebkitAppearance: "none"
               }}
             />
 
@@ -361,6 +382,9 @@ export default function ContactosContent() {
                 background: "rgba(255,255,255,0.1)",
                 color: "#fff",
                 fontSize: "1rem",
+                width: "100%",
+                boxSizing: "border-box",
+                WebkitAppearance: "none"
               }}
             />
 
@@ -384,6 +408,9 @@ export default function ContactosContent() {
                 color: "#fff",
                 fontSize: "1rem",
                 resize: "none",
+                width: "100%",
+                boxSizing: "border-box",
+                minHeight: "150px"
               }}
             ></textarea>
 

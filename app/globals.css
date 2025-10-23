@@ -99,10 +99,11 @@ html,
 body {
   font-size: 62.5%; /* propiedad de conversión, para que cada 10px, tengan el valor de 1rem (1rem=10px) */
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  position: relative;
 }
 
 body {
@@ -114,6 +115,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: black;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
@@ -137,11 +140,24 @@ body.contact-page {
   z-index: 1;
 }
 
-/* Asegurar que el footer siempre esté abajo */
-footer {
+/* Estilos del footer fijo */
+.footer-wrapper {
+  width: 100%;
   margin-top: auto;
   position: relative;
-  z-index: 2;
+  z-index: 100;
+}
+
+.main-footer {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
+  position: relative;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .contact-bg {
@@ -1019,18 +1035,42 @@ body.menu-open .main-header {
   html, body {
     height: 100%;
     overflow-x: hidden;
+    position: relative;
   }
   
+  /* Asegurar espacio para el footer fijo */
   body {
     min-height: 100vh;
     position: relative;
     display: flex;
     flex-direction: column;
+    padding-bottom: 80px; /* Espacio para el footer fijo */
+  }
+  
+  .footer-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    margin-top: 0;
+  }
+  
+  .main-footer {
+    padding: 1rem 0.5rem;
+    background-color: #1a1a1a;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Asegurar que el contenido principal tenga espacio en la parte inferior */
+  main {
+    padding-bottom: 2rem;
+    margin-bottom: 1rem;
   }
   
   /* Estilos específicos para la página de contactos */
   body.contact-page {
-    padding-bottom: 0;
+    padding-bottom: 80px; /* Asegurar espacio para el footer fijo */
   }
   
   .main-footer {

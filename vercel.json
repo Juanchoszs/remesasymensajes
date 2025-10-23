@@ -4,13 +4,13 @@
     {
       "source": "/_next/static/(.*)",
       "headers": [
-        { "key": "cache-control", "value": "public, max-age=31536000, immutable" }
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     },
     {
       "source": "/images/(.*)",
       "headers": [
-        { "key": "cache-control", "value": "public, max-age=31536000, immutable" }
+        { "key": "Cache-Control", "value": "public, max-age=604800, must-revalidate" }
       ]
     },
     {
@@ -18,12 +18,18 @@
       "headers": [
         {
           "key": "Link",
-          "value": "</_next/static/css/styles.css>; rel=preload; as=style, </_next/static/chunks/main.js>; rel=preload; as=script, </_next/static/chunks/pages/_app.js>; rel=preload; as=script, </_next/static/chunks/pages/index.js>; rel=preload; as=script, </_next/static/chunks/pages/servicios.js>; rel=preload; as=script, </_next/static/chunks/pages/contactos.js>; rel=preload; as=script"
+          "value": "</_next/static/css/styles.css>; rel=preload; as=style, </_next/static/chunks/main.js>; rel=preload; as=script, </_next/static/chunks/pages/_app.js>; rel=preload; as=script, </_next/static/chunks/pages/index.js>; rel=preload; as=script, </_next/static/chunks/framework.js>; rel=preload; as=script, </_next/static/runtime/main.js>; rel=preload; as=script"
         },
+        {
+          "key": "Link",
+          "value": "<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect, <https://cdn.vercel.com>; rel=preconnect"
+        },
+        { "key": "X-DNS-Prefetch-Control", "value": "on" },
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
     },
     {

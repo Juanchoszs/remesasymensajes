@@ -15,7 +15,7 @@ export default function ContactosPage() {
       </div>
       
       {/* Contenido principal */}
-      <div className="relative z-10 flex-grow pt-[5vh] pb-[25vh] md:pb-[15vh] lg:pb-[10vh]">
+      <div className="relative z-10 flex-grow pt-[5vh] pb-[40vh] sm:pb-[25vh] md:pb-[15vh] lg:pb-[10vh]">
         <ContactosContent />
       </div>
       

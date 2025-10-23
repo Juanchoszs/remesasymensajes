@@ -20,13 +20,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className="h-full">
-      <body className="flex flex-col min-h-screen">
+    <html lang="es" className="h-full scroll-smooth">
+      <body className="flex flex-col min-h-screen bg-gray-100">
         <Header />
-        <main className="flex-grow" style={{ marginTop: "40px" }}>
+        <main className="flex-grow w-full" style={{ marginTop: "40px" }}>
           {children}
         </main>
-        <div className="footer-wrapper mt-auto">
+        <div className="footer-wrapper w-full mt-auto">
           <SuperTransporteIcon />
           <Footer />
         </div>

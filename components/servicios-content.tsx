@@ -58,19 +58,29 @@ export default function ServiciosContent() {
 
   // Estilos reutilizables (sin fondo inline)
   const containerStyle: React.CSSProperties = {
-    minHeight: "100vh",
-    padding: "3rem 1rem",
+    minHeight: "calc(100vh - 150px)",
+    padding: "2rem 1rem 4rem 1rem",
     display: "flex",
     justifyContent: "center",
     color: "#fff",
     boxSizing: "border-box",
-    /* NOTA: no backgroundImage aquí — usa globals.css (.caja-s) */
+    width: "100%",
+    maxWidth: "100%",
+    overflowX: "hidden",
+    '@media (max-width: 620px)': {
+      padding: "1.5rem 0.5rem 3rem 0.5rem"
+    }
   };
 
   const innerStyle: React.CSSProperties = {
     width: "100%",
     maxWidth: "1200px",
     margin: "0 auto",
+    padding: "0 1rem",
+    boxSizing: "border-box",
+    '@media (max-width: 620px)': {
+      padding: "0 0.75rem"
+    }
   };
 
   const opcionesMainStyle: React.CSSProperties = {
@@ -79,21 +89,31 @@ export default function ServiciosContent() {
     justifyContent: "center",
     flexWrap: "wrap",
     marginBottom: "1.5rem",
+    padding: "0 0.5rem",
+    '@media (max-width: 620px)': {
+      gap: "0.5rem",
+      marginBottom: "1rem"
+    }
   };
 
   const buttonMainStyle: React.CSSProperties = {
-    padding: "1rem 2rem",
-    fontSize: "1.1rem",
+    padding: "0.8rem 1.2rem",
+    fontSize: "1rem",
     fontWeight: 600,
-    borderRadius: "8px",
-    border: "2px solid rgba(255, 255, 255, 0.2)",
-    background: "rgba(255, 255, 255, 0.1)",
+    borderRadius: "6px",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    background: "rgba(0, 0, 0, 0.6)",
     color: "white",
     cursor: "pointer",
     textAlign: "center" as const,
-    transition: "all 0.3s ease",
+    transition: "all 0.2s ease",
     backdropFilter: "blur(5px)",
-    minWidth: "180px",
+    minWidth: "140px",
+    '@media (max-width: 620px)': {
+      padding: "0.6rem 0.8rem",
+      fontSize: "0.9rem",
+      minWidth: "120px"
+    }
   };
 
   const opcionesSubStyle: React.CSSProperties = {
