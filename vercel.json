@@ -1,56 +1,31 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/_next/static/(.*)",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      },
-      "continue": true
-    },
-    {
-      "src": "/images/(.*)",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      },
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "headers": {
-        "Link": [
-          "</_next/static/css/styles.css>; rel=preload; as=style",
-          "</_next/static/chunks/main.js>; rel=preload; as=script",
-          "</_next/static/chunks/pages/_app.js>; rel=preload; as=script",
-          "</_next/static/chunks/pages/index.js>; rel=preload; as=script",
-          "</_next/static/chunks/pages/servicios.js>; rel=preload; as=script",
-          "</_next/static/chunks/pages/contactos.js>; rel=preload; as=script"
-        ]
-      },
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "headers": {
-        "X-Frame-Options": "DENY",
-        "X-Content-Type-Options": "nosniff",
-        "X-XSS-Protection": "1; mode=block",
-        "Referrer-Policy": "strict-origin-when-cross-origin"
-      }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
-  "regions": ["iad1"],
   "headers": [
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        { "key": "cache-control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        { "key": "cache-control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Link",
+          "value": "</_next/static/css/styles.css>; rel=preload; as=style, </_next/static/chunks/main.js>; rel=preload; as=script, </_next/static/chunks/pages/_app.js>; rel=preload; as=script, </_next/static/chunks/pages/index.js>; rel=preload; as=script, </_next/static/chunks/pages/servicios.js>; rel=preload; as=script, </_next/static/chunks/pages/contactos.js>; rel=preload; as=script"
+        },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
     {
       "source": "/api/(.*)",
       "headers": [
@@ -60,5 +35,6 @@
         { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
       ]
     }
-  ]
+  ],
+  "regions": ["iad1"]
 }

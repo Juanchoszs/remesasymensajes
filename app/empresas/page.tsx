@@ -29,17 +29,21 @@ export default function EmpresasPage() {
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container relative min-h-screen">
       {/* IMAGE: Fondo de amanecer en carretera - static/img/fondos/fondo-empresas.jpg */}
       <div
-        className="page-background"
+        className="fixed inset-0 -z-10"
         style={{
           backgroundImage: "url(/amanecer.webp)",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundRepeat: "no-repeat"
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed"
         }}
-      />
+      >
+        {/* Overlay para mejor legibilidad */}
+        <div className="absolute inset-0 bg-black/30"></div>
+      </div>
 
       <div className="emp-form-wrapper">
         {/* Carrusel de logos de clientes - only visible on desktop */}

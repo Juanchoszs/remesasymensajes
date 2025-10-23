@@ -19,10 +19,6 @@ export default function ContactosPage() {
         <ContactosContent />
       </div>
       
-      {/* Footer fijo */}
-      <div className="relative z-20 w-full">
-        <Footer />
       </div>
-    </div>
   )
 }
