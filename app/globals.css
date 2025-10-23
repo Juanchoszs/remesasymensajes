@@ -209,7 +209,7 @@ header {
   top: 0;
   width: 100%;
   padding: 0 0 2rem 0;
-  z-index: 2;
+  z-index: 1000;
   overflow: visible;
 }
 
@@ -301,8 +301,71 @@ header {
   justify-content: space-evenly;
 }
 
-.menu-toggle ion-icon {
-  font-size: 1.6rem;
+/* Estilos para el botón del menú con mayor especificidad */
+button.menu-toggle[type="button"] {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  /* Escala desde móviles hasta súper grandes */
+  font-size: clamp(2.2rem, 1.4rem + 1.1vw, 3.6rem) !important;
+  color: white !important;
+  padding: 0.5rem !important;
+  font-family: inherit !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.2s ease !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 0.2rem !important;
+}
+
+button.menu-toggle[type="button"]:hover {
+  transform: scale(1.1) !important;
+}
+
+button.menu-toggle[type="button"]:active {
+  transform: scale(0.95) !important;
+}
+
+/* Ocultar el botón del menú en pantallas grandes */
+@media (min-width: 621px) {
+  button.menu-toggle[type="button"] {
+    display: none !important;
+  }
+}
+
+/* Evitar interacción y scroll del fondo cuando el menú móvil esté abierto */
+body:has(.mobile-menu.active) {
+  overflow: hidden !important;
+}
+body:has(.mobile-menu.active) *:not(.mobile-menu):not(.mobile-menu *) {
+  pointer-events: none !important;
+}
+.mobile-menu,
+.mobile-menu * {
+  pointer-events: auto;
+}
+
+/* Asegurar que el contenedor del menú (header) quede por encima cuando está activo */
+body:has(.mobile-menu.active) header,
+body:has(.mobile-menu.active) .main-header {
+  position: fixed !important;
+  z-index: 2147483646 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+/* Fallback si se usa una clase en el body desde JS */
+body.menu-open header,
+body.menu-open .main-header {
+  position: fixed !important;
+  z-index: 2147483646 !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
 }
 
 /* Estilos de las opciones del header en pantallas grandes */
@@ -373,7 +436,7 @@ header {
   height: auto;
   max-height: calc(100vh - 15rem);
   cursor: pointer;
-  z-index: 1;
+  z-index: 2147483647; /* ensure on top */
   border-left: .2rem solid red;
 }
 
@@ -1028,7 +1091,7 @@ header {
   .main-header {
     min-height: 7rem;
     padding: 0.5rem 0.2rem 1.5rem 0.2rem;
-    z-index: 10;
+    z-index: 1000;
     position: relative;
   }
 
@@ -1038,7 +1101,7 @@ header {
 
   /* Fixed mobile menu to be full screen, fixed position, no scroll */
   .mobile-menu {
-    position: fixed;
+    position: fixed !important;
     top: 0;
     left: 0;
     right: 0;
@@ -1049,7 +1112,7 @@ header {
     backdrop-filter: blur(10px);
     display: none;
     flex-direction: column;
-    z-index: 100;
+    z-index: 2147483647; /* ensure overlays any content */
     border: none;
     transform: translateX(100%);
     transition: transform 0.3s ease;
@@ -1207,11 +1270,11 @@ header {
 
   .acordeon {
     align-items: flex-end;
-    min-height: 15rem;
+    min-height: 10rem; /* Reduced from 15rem */
     flex: 0 0 auto;
     cursor: pointer;
     transition: all 0.4s ease;
-    margin-bottom: 0.5rem;
+    margin: 0; /* Removed bottom margin */
   }
 
   .acordeon .caja-acordeon,
@@ -1221,22 +1284,23 @@ header {
     transform: translateX(0);
     position: relative;
     right: 1rem;
-    margin-bottom: 1rem;
+    margin: 0; /* Removed bottom margin */
     height: auto;
-    max-height: 6rem;
+    max-height: 5rem; /* Reduced from 6rem */
     padding: 0;
     overflow: hidden;
     transition: all 0.4s ease;
   }
 
   .acordeon.mobile-expanded {
-    min-height: 35vh;
+    min-height: 25vh; /* Reduced from 35vh */
     flex: 1;
+    margin: 0; /* Removed bottom margin */
   }
 
   .acordeon.mobile-expanded .caja-acordeon,
   .acordeon.mobile-expanded .caja-acordeon-final {
-    max-height: 60vh;
+    max-height: 45vh; /* Reduced from 60vh */
     overflow-y: auto;
   }
 
@@ -1280,9 +1344,9 @@ header {
     left: auto;
     right: 1rem;
     height: auto;
-    max-height: 6rem;
+    max-height: 5rem; /* Reduced from 6rem */
     bottom: auto;
-    margin-bottom: 1rem;
+    margin: 0; /* Removed bottom margin */
     overflow: hidden;
     transition: all 0.4s ease;
   }

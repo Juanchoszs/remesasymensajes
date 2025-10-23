@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Logo from "./logo"
 import MobileMenu from "./mobile-menu"
@@ -11,6 +11,20 @@ export default function Header() {
 
   const toggleMenu = () => setMenuOpen(!menuOpen)
   const closeMenu = () => setMenuOpen(false)
+
+  // Añadir/quitar clase menu-open al body cuando el menú cambia
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.classList.add('menu-open')
+    } else {
+      document.body.classList.remove('menu-open')
+    }
+    
+    // Cleanup: remover la clase cuando el componente se desmonte
+    return () => {
+      document.body.classList.remove('menu-open')
+    }
+  }, [menuOpen])
 
   return (
     <header>
