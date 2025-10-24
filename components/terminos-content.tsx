@@ -26,13 +26,17 @@ export default function TerminosContent() {
     justifyContent: "center",
     color: "#fff",
     boxSizing: "border-box",
-    /* NOTA: no backgroundImage aquí — usa globals.css (.caja-s) */
+    maxHeight: "none",
+    height: "auto",
+    overflow: "visible"
   };
 
   const innerStyle: React.CSSProperties = {
     width: "100%",
     maxWidth: "1200px",
     margin: "0 auto",
+    height: "auto",
+    overflow: "visible"
   };
 
   const opcionesMainStyle: React.CSSProperties = {
@@ -91,6 +95,10 @@ export default function TerminosContent() {
     boxShadow: "0 12px 35px rgba(0,0,0,0.5)",
     color: "#f8f9fa",
     border: "1px solid rgba(255, 255, 255, 0.1)",
+    height: "auto",
+    maxHeight: "none",
+    overflow: "visible",
+    boxSizing: "border-box"
   };
 
   const headingStyle: React.CSSProperties = {
@@ -255,12 +263,7 @@ export default function TerminosContent() {
               whiteSpace: 'pre-line',
               marginTop: '1.5rem',
               lineHeight: '1.8',
-              fontSize: '1.1rem',
-              maxHeight: '60vh',
-              overflowY: 'auto',
-              paddingRight: '1rem',
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(255,255,255,0.3) transparent'
+              fontSize: '1.1rem'
             }}>
               <div style={{ padding: '0.5rem' }}>
                 {terminosText}
@@ -277,11 +280,7 @@ export default function TerminosContent() {
               whiteSpace: 'pre-line',
               lineHeight: '1.8',
               fontSize: '1.1rem',
-              maxHeight: '60vh',
-              overflowY: 'auto',
-              paddingRight: '1rem',
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(255,255,255,0.3) transparent'
+              marginTop: '1.5rem'
             }}>
               <div style={{ padding: '0.5rem' }}>
                 {proteccionDatosText}
@@ -298,11 +297,7 @@ export default function TerminosContent() {
               whiteSpace: 'pre-line',
               lineHeight: '1.8',
               fontSize: '1.1rem',
-              maxHeight: '60vh',
-              overflowY: 'auto',
-              paddingRight: '1rem',
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(255,255,255,0.3) transparent',
+              marginTop: '1.5rem',
               marginBottom: '1.5rem'
             }}>
               <div style={{ padding: '0.5rem' }}>

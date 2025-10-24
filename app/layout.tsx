@@ -21,6 +21,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="h-full scroll-smooth">
+      <head>
+        <link rel="preload" as="video" href="/video-empresa-logistica-1.mp4" type="video/mp4" />
+        <link rel="preload" as="video" href="/video-empresa-logistica-2.mp4" type="video/mp4" />
+        <link rel="preload" as="video" href="/video-empresa-logistica-3.mp4" type="video/mp4" />
+      </head>
       <body className="flex flex-col min-h-screen bg-gray-100">
         <Header />
         <main className="flex-grow w-full" style={{ marginTop: "40px" }}>

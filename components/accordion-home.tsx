@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react"
 import Link from "next/link"
+import AutoVideo from "@/components/auto-video"
 
 interface AccordionSection {
   id: string
@@ -97,8 +98,9 @@ export default function AccordionHome() {
           onMouseLeave={() => handleMouseLeave(section.id)}
           onClick={() => isMobile && toggleAccordion(section.id)}
         >
-          <video
+          <AutoVideo
             ref={(el) => {
+              // Mantener la API existente de refs para controles de hover en desktop
               videoRefs.current[section.id] = el
             }}
             src={section.videoSrc}
@@ -106,7 +108,7 @@ export default function AccordionHome() {
             muted
             loop
             preload="auto"
-            aria-label="Video de la empresa"
+            playsInline
           />
           <div className={section.isFinal ? "caja-acordeon-final" : "caja-acordeon"}>
             <div className="acordeon-caja">

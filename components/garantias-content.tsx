@@ -52,13 +52,17 @@ export default function GarantiasContent() {
     justifyContent: "center",
     color: "#fff",
     boxSizing: "border-box",
-    /* NOTA: no backgroundImage aquí — usa globals.css (.caja-s) */
+    maxHeight: "none",
+    height: "auto",
+    overflow: "visible"
   };
 
   const innerStyle: React.CSSProperties = {
     width: "100%",
     maxWidth: "1200px",
     margin: "0 auto",
+    height: "auto",
+    overflow: "visible"
   };
 
   const opcionesMainStyle: React.CSSProperties = {
@@ -117,6 +121,10 @@ export default function GarantiasContent() {
     boxShadow: "0 12px 35px rgba(0,0,0,0.5)",
     color: "#f8f9fa",
     border: "1px solid rgba(255, 255, 255, 0.1)",
+    height: "auto",
+    maxHeight: "none",
+    overflow: "visible",
+    boxSizing: "border-box"
   };
 
   const headingStyle: React.CSSProperties = {

@@ -98,33 +98,37 @@ export default function ContactosContent() {
   }
 
   const contentStyle: React.CSSProperties = {
-    maxWidth: "700px",
+    maxWidth: "900px",
     width: "100%",
     margin: "0 auto",
-    padding: "1.5rem",
-    background: "rgba(0, 0, 0, 0.6)",
-    borderRadius: "12px",
+    padding: "2rem",
+    background: "linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.65))",
+    borderRadius: "16px",
     backdropFilter: "blur(10px)",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-    transition: "all 0.3s ease",
-    overflow: "visible",
-    boxSizing: "border-box"
+    boxShadow: "0 12px 35px rgba(0,0,0,0.5)",
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    boxSizing: "border-box",
+    height: "auto",
+    maxHeight: "none",
+    overflow: "visible"
   }
 
   const titleStyle: React.CSSProperties = {
-    fontSize: "2rem",
-    marginBottom: "1rem",
-    color: "#fff",
+    fontSize: "1.8rem",
+    marginBottom: "1.5rem",
+    color: "#ffffff",
     textAlign: "center",
+    fontWeight: 800,
     textShadow: "0 2px 4px rgba(0,0,0,0.3)",
+    letterSpacing: "0.5px"
   }
 
   const textStyle: React.CSSProperties = {
-    fontSize: "1rem",
-    lineHeight: "1.5",
-    marginBottom: "1.4rem",
+    fontSize: "1.1rem",
+    lineHeight: "1.8",
+    marginBottom: "1.5rem",
     textAlign: "center",
-    color: "#f0f0f0",
+    color: "#f8f9fa"
   }
 
   const mapStyle: React.CSSProperties = {
@@ -141,27 +145,23 @@ export default function ContactosContent() {
       className="caja-w"
       onClick={closeContent}
       style={{
-        padding: "5rem 1rem 8rem 1rem",
+        padding: "3rem 1rem",
         minHeight: "100vh",
         color: "#fff",
         boxSizing: "border-box",
-        position: "relative",
         display: "flex",
-        flexDirection: "column",
-        width: "100%"
+        justifyContent: "center",
+        maxHeight: "none",
+        height: "auto",
+        overflow: "visible"
       }}
     >
       <div style={{
-        position: 'relative',
-        zIndex: 2,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-        borderRadius: '12px',
-        padding: '1.5rem',
-        margin: '1rem auto 2rem',
-        maxWidth: '1200px',
-        width: '100%',
-        boxSizing: 'border-box',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        width: "100%",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        height: "auto",
+        overflow: "visible"
       }}>
       {/* === BOTONES DE UBICACIONES === */}
       <div
@@ -171,11 +171,7 @@ export default function ContactosContent() {
           flexWrap: "wrap",
           gap: "1rem",
           justifyContent: "center",
-          margin: "0 auto 2rem",
-          maxWidth: "1200px",
-          width: "100%",
-          padding: "0 1rem",
-          boxSizing: "border-box"
+          marginBottom: "1.5rem"
         }}
       >
         {[
@@ -185,30 +181,43 @@ export default function ContactosContent() {
           { id: "contenido-w7", label: "Villavicencio" },
           { id: "contenido-w8", label: "Yopal" },
           { id: "contenido-w9", label: "PQR's" },
-        ].map(({ id, label }) => (
-          <button
-            key={id}
-            className={`opcion-w ${activeContent === id ? "activo" : ""}`}
-            onClick={(e) => showContent(id as ContentId, e)}
-            style={{
-              padding: "1rem 2rem",
-              fontSize: "1.25rem",
-              fontWeight: 600,
-              borderRadius: "8px",
-              border: "2px solid rgba(255, 255, 255, 0.2)",
-              background:
-                activeContent === id
+        ].map(({ id, label }) => {
+          const isActive = activeContent === id;
+          return (
+            <button
+              key={id}
+              className={`opcion-w ${isActive ? "activo" : ""}`}
+              onClick={(e) => showContent(id as ContentId, e)}
+              aria-pressed={isActive}
+              style={{
+                padding: "1rem 2rem",
+                fontSize: "1.1rem",
+                fontWeight: 600,
+                borderRadius: "8px",
+                border: "2px solid rgba(255, 255, 255, 0.2)",
+                background: isActive
                   ? "rgba(255, 255, 255, 0.25)"
                   : "rgba(255, 255, 255, 0.1)",
-              color: "white",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              backdropFilter: "blur(5px)",
-            }}
-          >
-            {label}
-          </button>
-        ))}
+                color: "white",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                backdropFilter: "blur(5px)",
+                minWidth: "180px",
+                textAlign: "center"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = isActive
+                  ? "rgba(255, 255, 255, 0.25)"
+                  : "rgba(255, 255, 255, 0.1)";
+              }}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       {/* === CONTENIDOS DE SEDES === */}
@@ -258,7 +267,7 @@ export default function ContactosContent() {
       ].map(
         ({ id, title, address, img, map, phone }) =>
           activeContent === id && (
-            <div key={id} className="contenido-w" style={contentStyle}>
+            <section key={id} style={contentStyle}>
               <h2 style={titleStyle}>{title}</h2>
               <p style={textStyle}>{address}</p>
               {phone && (
@@ -286,22 +295,14 @@ export default function ContactosContent() {
                   }}
                 />
               </a>
-            </div>
+            </section>
           )
       )}
 
       {/* === FORMULARIO PQR's === */}
       {activeContent === "contenido-w9" && (
-        <div
-          className="contenido-w"
-          style={{
-            ...contentStyle,
-            maxWidth: "850px",
-            width: "100%",
-            padding: "1.5rem",
-            margin: "0 auto",
-            overflow: "visible"
-          }}
+        <section
+          style={contentStyle}
         >
           <form 
             onSubmit={handleSubmitPQRS} 
@@ -395,7 +396,7 @@ export default function ContactosContent() {
               name="mensaje"
               id="coments"
               cols={30}
-              rows={8}
+              rows={6}
               placeholder="Escribe tu Petición, queja o reclamo"
               value={formData.mensaje}
               onChange={handleInputChange}
@@ -407,10 +408,11 @@ export default function ContactosContent() {
                 background: "rgba(255,255,255,0.1)",
                 color: "#fff",
                 fontSize: "1rem",
-                resize: "none",
+                resize: "vertical",
                 width: "100%",
                 boxSizing: "border-box",
-                minHeight: "150px"
+                minHeight: "120px",
+                maxHeight: "300px"
               }}
             ></textarea>
 
@@ -445,7 +447,7 @@ export default function ContactosContent() {
               {isSubmitting ? "ENVIANDO..." : "ENVIAR"}
             </button>
           </form>
-        </div>
+        </section>
       )}
       </div>
     </div>

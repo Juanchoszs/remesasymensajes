@@ -58,18 +58,18 @@ export default function ServiciosContent() {
 
   // Estilos reutilizables (sin fondo inline)
   const containerStyle: React.CSSProperties = {
-    minHeight: "calc(100vh - 150px)",
-    padding: "2rem 1rem 4rem 1rem",
+    minHeight: "100vh",
+    padding: "3rem 1rem",
     display: "flex",
     justifyContent: "center",
     color: "#fff",
     boxSizing: "border-box",
     width: "100%",
     maxWidth: "100%",
-    overflowX: "hidden",
-    '@media (max-width: 620px)': {
-      padding: "1.5rem 0.5rem 3rem 0.5rem"
-    }
+    maxHeight: "none",
+    height: "auto",
+    overflow: "visible",
+    overflowX: "hidden"
   };
 
   const innerStyle: React.CSSProperties = {
@@ -78,9 +78,8 @@ export default function ServiciosContent() {
     margin: "0 auto",
     padding: "0 1rem",
     boxSizing: "border-box",
-    '@media (max-width: 620px)': {
-      padding: "0 0.75rem"
-    }
+    height: "auto",
+    overflow: "visible"
   };
 
   const opcionesMainStyle: React.CSSProperties = {
@@ -89,11 +88,7 @@ export default function ServiciosContent() {
     justifyContent: "center",
     flexWrap: "wrap",
     marginBottom: "1.5rem",
-    padding: "0 0.5rem",
-    '@media (max-width: 620px)': {
-      gap: "0.5rem",
-      marginBottom: "1rem"
-    }
+    padding: "0 0.5rem"
   };
 
   const buttonMainStyle: React.CSSProperties = {
@@ -108,12 +103,7 @@ export default function ServiciosContent() {
     textAlign: "center" as const,
     transition: "all 0.2s ease",
     backdropFilter: "blur(5px)",
-    minWidth: "140px",
-    '@media (max-width: 620px)': {
-      padding: "0.6rem 0.8rem",
-      fontSize: "0.9rem",
-      minWidth: "120px"
-    }
+    minWidth: "140px"
   };
 
   const opcionesSubStyle: React.CSSProperties = {
@@ -149,6 +139,10 @@ export default function ServiciosContent() {
     boxShadow: "0 12px 35px rgba(0,0,0,0.5)",
     color: "#f8f9fa",
     border: "1px solid rgba(255, 255, 255, 0.1)",
+    height: "auto",
+    maxHeight: "none",
+    overflow: "visible",
+    boxSizing: "border-box"
   };
 
   const headingStyle: React.CSSProperties = {
