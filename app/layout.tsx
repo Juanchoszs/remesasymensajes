@@ -28,7 +28,7 @@ export default function RootLayout({
       </head>
       <body className="flex flex-col min-h-screen bg-gray-100">
         <Header />
-        <main className="flex-grow w-full" style={{ marginTop: "40px" }}>
+        <main className="flex-grow w-full">
           {children}
         </main>
         <div className="footer-wrapper w-full mt-auto">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Image from 'next/image';
 
 export default function Background() {
   useEffect(() => {
@@ -11,11 +12,27 @@ export default function Background() {
   }, []);
 
   return (
-    <div 
-      className="contact-bg"
-      style={{
-        backgroundImage: 'url(/carretera.webp)'
-      }}
-    />
+    <div className="contact-bg" style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      width: '100vw', 
+      height: '100vh', 
+      zIndex: -1,
+      overflow: 'hidden'
+    }}>
+      <Image
+        src="/carretera.webp"
+        alt="Fondo de servicios"
+        fill
+        sizes="100vw"
+        style={{ 
+          objectFit: 'cover',
+          objectPosition: 'center'
+        }}
+        priority
+        quality={75}
+      />
+    </div>
   );
 }
