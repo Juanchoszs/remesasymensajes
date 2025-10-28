@@ -26,6 +26,8 @@ export default function Footer() {
         </a>
         <a 
           href="https://www.linkedin.com/company/remesas-y-mensajes-ltd/" 
+          target="_blank"
+          rel="noreferrer"
           className="icon-t"
           style={{ display: 'inline-flex', alignItems: 'center' }}
         >

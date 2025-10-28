@@ -1,0 +1,17 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://tudominio.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+
+# Allow all other pages
+Allow: /*.html$
+Allow: /$
+
+# Crawl-delay: 10  # Uncomment and adjust if needed to limit crawl rate

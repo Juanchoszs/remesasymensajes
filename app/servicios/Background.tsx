@@ -22,7 +22,7 @@ export default function Background() {
       overflow: 'hidden'
     }}>
       <Image
-        src="/carretera.webp"
+        src="/Carretera.webp"
         alt="Fondo de servicios"
         fill
         sizes="100vw"
