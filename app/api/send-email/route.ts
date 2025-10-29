@@ -331,13 +331,15 @@ Enviado: ${new Date().toLocaleString('es-ES')}
           headers: { 'Content-Type': 'application/json', ...corsHeaders }
         }
       )
-    } catch (error) {
-      console.error('❌ Error al enviar el correo:', error)
+    } catch (err) {
+      const error = err as Error;
+      console.error('❌ Error al enviar el correo:', error);
+      const errorMessage = error?.message || 'Error desconocido al enviar el correo';
       return new NextResponse(
         JSON.stringify({
           success: false,
           error: 'Error al enviar el correo. Por favor, inténtalo de nuevo más tarde.',
-          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+          details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
         }),
         {
           status: 500,
@@ -423,13 +425,15 @@ ${process.env.EMPRESA_NOMBRE || 'El equipo'}
       // No fallar la solicitud principal por esto
     }
 
-  } catch (error) {
-    console.error('❌ Error en el servidor:', error)
+  } catch (err) {
+    const error = err as Error;
+    console.error('❌ Error en el servidor:', error);
+    const errorMessage = error?.message || 'Error desconocido en el servidor';
     return new NextResponse(
       JSON.stringify({
         success: false,
         error: 'Error en el servidor. Por favor, inténtalo de nuevo más tarde.',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
       }),
       {
         status: 500,
