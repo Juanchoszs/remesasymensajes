@@ -23,12 +23,8 @@ export default function EmpresasPage() {
     setSubmitStatus(null)
 
     try {
-      // Usar la ruta absoluta para la API en producción
-      const apiUrl = process.env.NODE_ENV === 'production' 
-        ? 'https://remesasymensajes.vercel.app/api/send-email'
-        : '/api/send-email'
-
-      const response = await fetch(apiUrl, {
+      // Usar siempre ruta relativa para evitar problemas de CORS/domains en producción
+      const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
