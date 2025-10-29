@@ -12,6 +12,15 @@ interface FormData {
   comentarios: string
 }
 
+// Interfaz para la respuesta de la API
+interface ApiResponse {
+  success: boolean
+  message?: string
+  error?: string
+  details?: any
+  messageId?: string
+}
+
 // Función para generar el HTML del correo con diseño profesional
 function generateEmailHTML(data: FormData): string {
   // Traducir valores a texto legible
@@ -169,8 +178,9 @@ function generateEmailHTML(data: FormData): string {
 // Configuración de CORS
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS, GET',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Max-Age': '86400' // 24 horas
 }
 
 // Handler para OPTIONS (preflight)
@@ -181,13 +191,74 @@ export async function OPTIONS() {
   })
 }
 
+// Función para crear una respuesta HTTP estandarizada
+function createResponse(
+  data: ApiResponse,
+  status: number = 200,
+  headers: Record<string, string> = {}
+): NextResponse {
+  return new NextResponse(JSON.stringify(data), {
+    status,
+    headers: {
+      'Content-Type': 'application/json',
+      ...corsHeaders,
+      ...headers
+    }
+  })
+}
+
+// Función para validar el correo electrónico
+function isValidEmail(email: string): boolean {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return re.test(email)
+}
+
+// Función para validar los datos del formulario
+function validateFormData(data: Partial<FormData>): { isValid: boolean; error?: string } {
+  if (!data.nombreEmpresa?.trim()) {
+    return { isValid: false, error: 'El nombre de la empresa es requerido' }
+  }
+  if (!data.correo?.trim()) {
+    return { isValid: false, error: 'El correo electrónico es requerido' }
+  }
+  if (!isValidEmail(data.correo)) {
+    return { isValid: false, error: 'El correo electrónico no es válido' }
+  }
+  if (!data.objetoSocial?.trim()) {
+    return { isValid: false, error: 'El objeto social es requerido' }
+  }
+  if (!data.tipoMercancia?.trim()) {
+    return { isValid: false, error: 'El tipo de mercancía es requerido' }
+  }
+  if (!data.capacidadAlmacenamiento?.trim()) {
+    return { isValid: false, error: 'La capacidad de almacenamiento es requerida' }
+  }
+  if (!data.frecuenciaEnvio?.trim()) {
+    return { isValid: false, error: 'La frecuencia de envío es requerida' }
+  }
+  return { isValid: true }
+}
+
+// Handler GET para verificar que el endpoint está activo
+export async function GET() {
+  return createResponse({
+    success: true,
+    message: 'API de envío de correos funcionando correctamente',
+    environment: process.env.NODE_ENV || 'development'
+  })
+}
+
 // Handler POST para enviar el correo
 export async function POST(request: NextRequest) {
-  // Configurar encabezados CORS en la respuesta
-  const headers = new Headers()
-  Object.entries(corsHeaders).forEach(([key, value]) => {
-    headers.set(key, value)
-  })
+
+  // Validar método de la solicitud
+  if (request.method !== 'POST') {
+    return createResponse(
+      { success: false, error: 'Método no permitido' },
+      405,
+      { 'Allow': 'POST, OPTIONS' }
+    )
+  }
 
   try {
     // Validar que las variables de entorno estén configuradas
@@ -202,49 +273,44 @@ export async function POST(request: NextRequest) {
       .map(([key]) => key)
     
     if (missingVars.length > 0) {
-      console.error('Variables de entorno faltantes:', missingVars)
-      return new NextResponse(
-        JSON.stringify({
-          success: false,
-          error: 'Configuración de correo incompleta. Por favor contacta al administrador.',
-          missingVars
-        }),
+      console.error('❌ Variables de entorno faltantes:', missingVars)
+      return createResponse(
         {
-          status: 500,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders }
-        }
+          success: false,
+          error: 'Configuración de correo incompleta',
+          details: `Faltan las siguientes variables de entorno: ${missingVars.join(', ')}`
+        },
+        500
       )
     }
 
-    // Obtener los datos del formulario
+    // Obtener y validar los datos del formulario
     let data: FormData
     try {
       data = await request.json()
+      
+      // Validar datos requeridos
+      const validation = validateFormData(data)
+      if (!validation.isValid && validation.error) {
+        console.error('❌ Validación fallida:', validation.error)
+        return createResponse(
+          {
+            success: false,
+            error: validation.error
+          },
+          400
+        )
+      }
     } catch (error) {
-      console.error('Error al parsear JSON:', error)
-      return new NextResponse(
-        JSON.stringify({
-          success: false,
-          error: 'Formato de datos inválido'
-        }),
+      console.error('❌ Error al procesar la solicitud:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido al procesar la solicitud'
+      return createResponse(
         {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders }
-        }
-      )
-    }
-
-    // Validar datos requeridos
-    if (!data.nombreEmpresa || !data.correo || !data.objetoSocial || !data.tipoMercancia) {
-      return new NextResponse(
-        JSON.stringify({
           success: false,
-          error: 'Datos del formulario incompletos'
-        }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders }
-        }
+          error: 'Error al procesar los datos del formulario',
+          details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+        },
+        400
       )
     }
 
@@ -261,6 +327,11 @@ export async function POST(request: NextRequest) {
         // Solo en desarrollo, en producción deberías usar un certificado válido
         rejectUnauthorized: process.env.NODE_ENV !== 'production'
       },
+      pool: true, // Usar conexiones persistentes
+      maxConnections: 1, // Máximo de conexiones concurrentes
+      maxMessages: 5, // Máximo de mensajes por conexión
+      rateDelta: 1000, // Tiempo de espera entre mensajes (ms)
+      rateLimit: 5, // Máximo de mensajes por rateDelta
       connectionTimeout: 10000, // 10 segundos
       greetingTimeout: 5000,    // 5 segundos
       socketTimeout: 10000,     // 10 segundos
@@ -268,22 +339,38 @@ export async function POST(request: NextRequest) {
       logger: process.env.NODE_ENV === 'development'
     })
 
-    // Verificar la conexión
+    // Verificar la conexión con el servidor SMTP
     try {
-      await transporter.verify()
-      console.log('✅ Servidor de correo listo para enviar mensajes')
+      console.log('🔍 Verificando conexión con el servidor SMTP...')
+      const isVerified = await transporter.verify()
+      if (isVerified) {
+        console.log('✅ Conexión con el servidor SMTP verificada correctamente')
+      } else {
+        console.warn('⚠️ La verificación del servidor SMTP no devolvió un resultado claro')
+      }
     } catch (error) {
-      console.error('❌ Error al verificar el servidor de correo:', error)
-      return new NextResponse(
-        JSON.stringify({
-          success: false,
-          error: 'Error de configuración del servidor de correo. Verifica tus credenciales.',
-          details: error instanceof Error ? error.message : 'Error desconocido'
-        }),
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido al verificar el servidor SMTP'
+      console.error('❌ Error al verificar el servidor de correo:', errorMessage)
+      
+      // Intentar obtener más detalles del error
+      let errorDetails = ''
+      if (error instanceof Error) {
+        errorDetails = error.stack || error.message
+      } else if (typeof error === 'object' && error !== null) {
+        errorDetails = JSON.stringify(error, null, 2)
+      } else {
+        errorDetails = String(error)
+      }
+      
+      console.error('📋 Detalles del error de conexión SMTP:', errorDetails)
+      
+      return createResponse(
         {
-          status: 500,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders }
-        }
+          success: false,
+          error: 'No se pudo conectar con el servidor de correo',
+          details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+        },
+        503 // Service Unavailable
       )
     }
 
@@ -317,87 +404,147 @@ Enviado: ${new Date().toLocaleString('es-ES')}
 
     // Enviar el correo principal con manejo de errores
     try {
+      console.log('📤 Enviando correo electrónico...')
       const info = await transporter.sendMail(mailOptions)
-      console.log('✅ Correo enviado exitosamente:', info.messageId)
       
-      return new NextResponse(
-        JSON.stringify({
+      if (info && info.messageId) {
+        console.log('✅ Correo enviado exitosamente. ID del mensaje:', info.messageId)
+        
+        // Enviar correo de confirmación al cliente (sin esperar a que termine)
+        sendConfirmationEmail(transporter, data).catch(confirmError => {
+          console.warn('⚠️ No se pudo enviar el correo de confirmación:', confirmError)
+        })
+        
+        return createResponse({
           success: true,
-          message: 'Correo enviado exitosamente',
+          message: '¡Mensaje enviado correctamente!',
           messageId: info.messageId
-        }),
+        })
+      } else {
+        console.error('❌ El servidor SMTP no devolvió un ID de mensaje válido')
+        return createResponse(
+          {
+            success: false,
+            error: 'Error al enviar el correo. Por favor, inténtalo de nuevo.'
+          },
+          500
+        )
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido al enviar el correo'
+      console.error('❌ Error al enviar el correo:', errorMessage)
+      
+      // Intentar obtener más detalles del error
+      let errorDetails = ''
+      if (error instanceof Error) {
+        errorDetails = error.stack || error.message
+      } else if (typeof error === 'object' && error !== null) {
+        errorDetails = JSON.stringify(error, null, 2)
+      } else {
+        errorDetails = String(error)
+      }
+      
+      console.error('📋 Detalles del error de envío:', errorDetails)
+      
+      return createResponse(
         {
-          status: 200,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders }
-        }
-      )
-    } catch (err) {
-      const error = err as Error;
-      console.error('❌ Error al enviar el correo:', error);
-      const errorMessage = error?.message || 'Error desconocido al enviar el correo';
-      return new NextResponse(
-        JSON.stringify({
           success: false,
-          error: 'Error al enviar el correo. Por favor, inténtalo de nuevo más tarde.',
+          error: 'Error al enviar el mensaje. Por favor, inténtalo de nuevo más tarde.',
           details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
-        }),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders }
-        }
+        },
+        500
       )
     }
 
-    // Enviar correo de confirmación al cliente
-    try {
-      await transporter.sendMail({
-        from: `"${process.env.EMPRESA_NOMBRE || 'Tu Empresa'}" <${process.env.EMAIL_USER}>`,
-        to: data.correo,
-        subject: '✅ Hemos recibido tu solicitud',
-        html: `
+// Función para enviar correo de confirmación al cliente
+async function sendConfirmationEmail(transporter: nodemailer.Transporter, data: FormData) {
+  try {
+    console.log('📨 Enviando correo de confirmación a:', data.correo)
+    
+    const info = await transporter.sendMail({
+      from: `"${process.env.EMPRESA_NOMBRE || 'Tu Empresa'}" <${process.env.EMAIL_USER}>`,
+      to: data.correo,
+      subject: '✅ Hemos recibido tu solicitud',
+      html: `
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de Solicitud</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+<body style="margin: 0; padding: 0; font-family: 'Arial', 'Helvetica', sans-serif; background-color: #f4f4f4;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px 0;">
     <tr>
       <td align="center">
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
           <tr>
             <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px;">✅ ¡Solicitud Recibida!</h1>
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                ✅ ¡Solicitud Recibida!
+              </h1>
+              <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 14px; opacity: 0.9;">
+                ${process.env.EMPRESA_NOMBRE || 'Gracias por contactarnos'}
+              </p>
             </td>
           </tr>
           <tr>
             <td style="padding: 40px 30px;">
-              <h2 style="color: #333333; font-size: 20px; margin: 0 0 15px 0;">Hola ${data.nombreEmpresa},</h2>
+              <h2 style="color: #333333; font-size: 20px; margin: 0 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #667eea;">
+                Hola ${data.nombreEmpresa || 'Cliente'},
+              </h2>
+              
               <p style="color: #555555; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                Gracias por contactarnos. Hemos recibido tu solicitud empresarial y nuestro equipo la está revisando.
+                Gracias por contactarte con nosotros. Hemos recibido tu solicitud y nuestro equipo la está revisando con atención.
               </p>
-              <p style="color: #555555; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                Nos pondremos en contacto contigo lo antes posible para discutir los detalles de tu servicio de envío.
-              </p>
+              
               <div style="background-color: #f8f9fa; border-radius: 6px; padding: 20px; margin: 20px 0;">
-                <p style="margin: 0; color: #555555; font-size: 14px; line-height: 1.6;">
-                  <strong>Resumen de tu solicitud:</strong><br>
-                  📦 Mercancía: ${data.tipoMercancia}<br>
-                  🚛 Capacidad: ${data.capacidadAlmacenamiento}<br>
-                  📅 Frecuencia: ${data.frecuenciaEnvio}
-                </p>
+                <h3 style="color: #333333; font-size: 16px; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0;">
+                  📋 Resumen de tu solicitud
+                </h3>
+                <table width="100%" cellpadding="8" cellspacing="0" style="font-size: 14px; color: #555555;">
+                  <tr>
+                    <td width="40%" style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Empresa:</strong></td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${data.nombreEmpresa || 'No especificado'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Correo:</strong></td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${data.correo || 'No especificado'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Tipo de Mercancía:</strong></td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${data.tipoMercancia || 'No especificado'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;"><strong>Capacidad:</strong></td>
+                    <td style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">${data.capacidadAlmacenamiento || 'No especificada'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0;"><strong>Frecuencia:</strong></td>
+                    <td style="padding: 8px 0;">${data.frecuenciaEnvio || 'No especificada'}</td>
+                  </tr>
+                </table>
               </div>
+              
+              <p style="color: #555555; font-size: 16px; line-height: 1.6; margin: 20px 0 0 0;">
+                Nos pondremos en contacto contigo a la brevedad para discutir los detalles de tu servicio de envío.
+              </p>
+              
+              <p style="color: #555555; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
+                Si tienes alguna pregunta adicional, no dudes en responder a este correo.
+              </p>
+              
               <p style="color: #555555; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
                 Saludos cordiales,<br>
-                <strong>${process.env.EMPRESA_NOMBRE || 'El equipo'}</strong>
+                <strong>${process.env.EMPRESA_NOMBRE || 'El equipo de atención al cliente'}</strong>
               </p>
             </td>
           </tr>
           <tr>
-            <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center;">
-              <p style="margin: 0; color: #999999; font-size: 12px;">
-                Este es un correo automático, por favor no responder.
+            <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+              <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.5;">
+                Este es un correo automático, por favor no respondas a este mensaje.<br>
+                Fecha de envío: ${new Date().toLocaleString('es-ES', { dateStyle: 'full', timeStyle: 'short' })}
               </p>
             </td>
           </tr>
@@ -407,38 +554,65 @@ Enviado: ${new Date().toLocaleString('es-ES')}
   </table>
 </body>
 </html>
-        `,
-        text: `
-Hola ${data.nombreEmpresa},
+      `.trim(),
+      // Versión de texto plano para clientes de correo que no soportan HTML
+      text: `
+Hola ${data.nombreEmpresa || 'Cliente'},
 
-Gracias por contactarnos. Hemos recibido tu solicitud empresarial y nuestro equipo la está revisando.
+Gracias por contactarte con nosotros. Hemos recibido tu solicitud y nuestro equipo la está revisando con atención.
 
-Nos pondremos en contacto contigo lo antes posible.
+RESUMEN DE TU SOLICITUD
+----------------------
+Empresa: ${data.nombreEmpresa || 'No especificado'}
+Correo: ${data.correo || 'No especificado'}
+Tipo de Mercancía: ${data.tipoMercancia || 'No especificado'}
+Capacidad: ${data.capacidadAlmacenamiento || 'No especificada'}
+Frecuencia: ${data.frecuenciaEnvio || 'No especificada'}
+
+Nos pondremos en contacto contigo a la brevedad para discutir los detalles de tu servicio de envío.
+
+Si tienes alguna pregunta adicional, no dudes en responder a este correo.
 
 Saludos cordiales,
-${process.env.EMPRESA_NOMBRE || 'El equipo'}
-        `.trim()
-      })
-      console.log('✅ Correo de confirmación enviado al cliente')
-    } catch (confirmError) {
-      console.warn('⚠️ No se pudo enviar el correo de confirmación al cliente:', confirmError)
-      // No fallar la solicitud principal por esto
-    }
+${process.env.EMPRESA_NOMBRE || 'El equipo de atención al cliente'}
 
-  } catch (err) {
-    const error = err as Error;
-    console.error('❌ Error en el servidor:', error);
-    const errorMessage = error?.message || 'Error desconocido en el servidor';
-    return new NextResponse(
-      JSON.stringify({
-        success: false,
-        error: 'Error en el servidor. Por favor, inténtalo de nuevo más tarde.',
-        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
-      }),
+---
+Este es un correo automático, por favor no respondas a este mensaje.
+      `.trim()
+    })
+    
+    console.log('✅ Correo de confirmación enviado correctamente a:', data.correo)
+    return true
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
+    console.error('❌ Error al enviar correo de confirmación:', errorMessage)
+    return false
+  }
+}
+
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido en el servidor'
+    console.error('❌ Error en el servidor:', errorMessage)
+    
+    // Intentar obtener más detalles del error
+    let errorDetails = ''
+    if (error instanceof Error) {
+      errorDetails = error.stack || error.message
+    } else if (typeof error === 'object' && error !== null) {
+      errorDetails = JSON.stringify(error, null, 2)
+    } else {
+      errorDetails = String(error)
+    }
+    
+    console.error('📋 Detalles del error del servidor:', errorDetails)
+    
+    return createResponse(
       {
-        status: 500,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders }
-      }
+        success: false,
+        error: 'Ha ocurrido un error en el servidor. Por favor, inténtalo de nuevo más tarde.',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
+      500
     )
   }
 }
