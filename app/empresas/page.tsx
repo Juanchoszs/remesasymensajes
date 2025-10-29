@@ -23,18 +23,26 @@ export default function EmpresasPage() {
     setSubmitStatus(null)
 
     try {
-      const response = await fetch('/api/send-email', {
+      // Usar la ruta absoluta para la API en producción
+      const apiUrl = process.env.NODE_ENV === 'production' 
+        ? 'https://remesasymensajes.vercel.app/api/send-email'
+        : '/api/send-email'
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
+        credentials: 'same-origin',
         body: JSON.stringify(formData),
       })
 
-      const result = await response.json()
+      const result = await response.json().catch(() => ({}))
 
       if (!response.ok) {
-        throw new Error(result.message || 'Error al enviar el formulario')
+        console.error('Error response:', result)
+        throw new Error(result.message || `Error al enviar el formulario (${response.status})`)
       }
 
       setSubmitStatus({

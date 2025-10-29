@@ -166,46 +166,106 @@ function generateEmailHTML(data: FormData): string {
   `.trim()
 }
 
+// Configuración de CORS
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+}
+
+// Handler para OPTIONS (preflight)
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders
+  })
+}
+
 // Handler POST para enviar el correo
 export async function POST(request: NextRequest) {
+  // Configurar encabezados CORS en la respuesta
+  const headers = new Headers()
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    headers.set(key, value)
+  })
+
   try {
     // Validar que las variables de entorno estén configuradas
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD || !process.env.EMAIL_TO) {
-      console.error('Variables de entorno faltantes:', {
-        EMAIL_USER: !!process.env.EMAIL_USER,
-        EMAIL_PASSWORD: !!process.env.EMAIL_PASSWORD,
-        EMAIL_TO: !!process.env.EMAIL_TO
-      })
-      
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Configuración de correo incompleta. Por favor contacta al administrador.' 
-        },
-        { status: 500 }
+    const requiredEnvVars = {
+      EMAIL_USER: process.env.EMAIL_USER,
+      EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
+      EMAIL_TO: process.env.EMAIL_TO
+    }
+    
+    const missingVars = Object.entries(requiredEnvVars)
+      .filter(([_, value]) => !value)
+      .map(([key]) => key)
+    
+    if (missingVars.length > 0) {
+      console.error('Variables de entorno faltantes:', missingVars)
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: 'Configuración de correo incompleta. Por favor contacta al administrador.',
+          missingVars
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
       )
     }
 
     // Obtener los datos del formulario
-    const data: FormData = await request.json()
-
-    // Validar datos requeridos
-    if (!data.nombreEmpresa || !data.correo || !data.objetoSocial || !data.tipoMercancia) {
-      return NextResponse.json(
-        { success: false, error: 'Datos del formulario incompletos' },
-        { status: 400 }
+    let data: FormData
+    try {
+      data = await request.json()
+    } catch (error) {
+      console.error('Error al parsear JSON:', error)
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: 'Formato de datos inválido'
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
       )
     }
 
-    // Configurar el transportador de nodemailer
+    // Validar datos requeridos
+    if (!data.nombreEmpresa || !data.correo || !data.objetoSocial || !data.tipoMercancia) {
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: 'Datos del formulario incompletos'
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
+      )
+    }
+
+    // Configurar el transportador de nodemailer con opciones mejoradas
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false, // true para 465, false para otros puertos
+      secure: process.env.SMTP_SECURE === 'true',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD,
       },
+      tls: {
+        // Solo en desarrollo, en producción deberías usar un certificado válido
+        rejectUnauthorized: process.env.NODE_ENV !== 'production'
+      },
+      connectionTimeout: 10000, // 10 segundos
+      greetingTimeout: 5000,    // 5 segundos
+      socketTimeout: 10000,     // 10 segundos
+      debug: process.env.NODE_ENV === 'development',
+      logger: process.env.NODE_ENV === 'development'
     })
 
     // Verificar la conexión
@@ -214,12 +274,16 @@ export async function POST(request: NextRequest) {
       console.log('✅ Servidor de correo listo para enviar mensajes')
     } catch (error) {
       console.error('❌ Error al verificar el servidor de correo:', error)
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Error de configuración del servidor de correo. Verifica tus credenciales.' 
-        },
-        { status: 500 }
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: 'Error de configuración del servidor de correo. Verifica tus credenciales.',
+          details: error instanceof Error ? error.message : 'Error desconocido'
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
       )
     }
 
@@ -251,10 +315,36 @@ Enviado: ${new Date().toLocaleString('es-ES')}
       `.trim(),
     }
 
-    // Enviar el correo
-    const info = await transporter.sendMail(mailOptions)
-
-    console.log('✅ Correo enviado exitosamente:', info.messageId)
+    // Enviar el correo principal con manejo de errores
+    try {
+      const info = await transporter.sendMail(mailOptions)
+      console.log('✅ Correo enviado exitosamente:', info.messageId)
+      
+      return new NextResponse(
+        JSON.stringify({
+          success: true,
+          message: 'Correo enviado exitosamente',
+          messageId: info.messageId
+        }),
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
+      )
+    } catch (error) {
+      console.error('❌ Error al enviar el correo:', error)
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: 'Error al enviar el correo. Por favor, inténtalo de nuevo más tarde.',
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
+      )
+    }
 
     // Enviar correo de confirmación al cliente
     try {
@@ -333,22 +423,18 @@ ${process.env.EMPRESA_NOMBRE || 'El equipo'}
       // No fallar la solicitud principal por esto
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Correo enviado exitosamente',
-      messageId: info.messageId,
-    })
-
   } catch (error) {
-    console.error('❌ Error al enviar el correo:', error)
-    
-    return NextResponse.json(
-      {
+    console.error('❌ Error en el servidor:', error)
+    return new NextResponse(
+      JSON.stringify({
         success: false,
-        error: 'Error al enviar el correo. Por favor intenta nuevamente.',
-        details: error instanceof Error ? error.message : 'Error desconocido'
-      },
-      { status: 500 }
+        error: 'Error en el servidor. Por favor, inténtalo de nuevo más tarde.',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      }
     )
   }
 }
