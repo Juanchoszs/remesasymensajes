@@ -14,11 +14,53 @@ export default function EmpresasPage() {
     frecuenciaEnvio: "",
     comentarios: "",
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<{ success: boolean; message: string } | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form data:", formData)
-    alert("Formulario enviado. Configuración de envío pendiente.")
+    setIsSubmitting(true)
+    setSubmitStatus(null)
+
+    try {
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Error al enviar el formulario')
+      }
+
+      setSubmitStatus({
+        success: true,
+        message: '¡Formulario enviado con éxito! Nos pondremos en contacto contigo pronto.'
+      })
+      
+      // Reset form
+      setFormData({
+        nombreEmpresa: "",
+        correo: "",
+        objetoSocial: "",
+        tipoMercancia: "",
+        capacidadAlmacenamiento: "",
+        frecuenciaEnvio: "",
+        comentarios: "",
+      })
+    } catch (error) {
+      console.error('Error submitting form:', error)
+      setSubmitStatus({
+        success: false,
+        message: error instanceof Error ? error.message : 'Error al enviar el formulario. Por favor, inténtalo de nuevo.'
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -165,9 +207,19 @@ export default function EmpresasPage() {
               />
             </div>
 
-            <button type="submit" className="btn-submit-empresarial">
-              Enviar
+            <button 
+              type="submit" 
+              className="btn-submit-empresarial"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Enviando...' : 'Enviar'}
             </button>
+            
+            {submitStatus && (
+              <div className={`mt-4 p-4 rounded-md ${submitStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                {submitStatus.message}
+              </div>
+            )}
           </form>
         </div>
       </div>
