@@ -618,10 +618,4 @@ Este es un correo automático, por favor no respondas a este mensaje.
 }
 
 // Handler GET para verificar que el endpoint está activo
-export async function GET() {
-  return NextResponse.json({
-    status: 'active',
-    message: 'API de envío de correos empresariales',
-    configured: !!(process.env.EMAIL_USER && process.env.EMAIL_PASSWORD && process.env.EMAIL_TO)
-  })
-}
+// Eliminado GET duplicado (ya existe otro handler GET más arriba)

@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   output: 'standalone',
   images: {
+    unoptimized: true,
     domains: [
       'www.sotcarga.com',
       'images.unsplash.com',
@@ -14,10 +14,6 @@ const nextConfig = {
   },
   // Configuración para manejar rutas en producción
   trailingSlash: true,
-  // Desactivar la optimización de imágenes si causa problemas
-  images: {
-    unoptimized: true,
-  },
   // Configuración de encabezados de seguridad
   async headers() {
     return [
