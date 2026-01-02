@@ -54,7 +54,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <li className="submenu" id="submenu2">
           <ul className="submenu-items">
             <li>
-              <a href="http://www.sotcarga.com/remesasymensajes/">Cliente Corporativo</a>
+              <a href="https://trazabilidad-rust.vercel.app/" target="_blank" rel="noopener noreferrer">Cliente Corporativo</a>
             </li>
           </ul>
         </li>

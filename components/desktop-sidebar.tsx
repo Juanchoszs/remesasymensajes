@@ -46,7 +46,7 @@ export default function DesktopSidebar({ isOpen, onClose }: DesktopSidebarProps)
               <Link href="/" onClick={onClose}>Inicio</Link>
             </li>
             <li>
-              <a href="http://www.sotcarga.com/remesasymensajes/">Cliente Corporativo</a>
+              <a href="https://trazabilidad-rust.vercel.app/" target="_blank" rel="noopener noreferrer">Cliente Corporativo</a>
             </li>
             <li>
               <Link href="/contactos" onClick={onClose}>Contáctanos</Link>

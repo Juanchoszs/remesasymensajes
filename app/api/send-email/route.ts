@@ -19,6 +19,7 @@ interface ApiResponse {
   error?: string
   details?: any
   messageId?: string
+  environment?: string
 }
 
 // Función para generar el HTML del correo con diseño profesional
@@ -363,6 +364,18 @@ export async function POST(request: NextRequest) {
       }
       
       console.error('📋 Detalles del error de conexión SMTP:', errorDetails)
+
+      // Mensaje amigable si es error de autenticación
+      if (errorMessage.includes('Invalid login') || errorMessage.includes('535')) {
+         return createResponse(
+          {
+            success: false,
+            error: 'Error de autenticación con el servidor de correo. Verifica tu correo y contraseña (o contraseña de aplicación) en el archivo .env.',
+            details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+          },
+          500 // Configuration Error
+        )
+      }
       
       return createResponse(
         {

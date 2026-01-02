@@ -37,8 +37,8 @@ export default function Header() {
                 <Link href="/">Inicio</Link>
               </li>
               <li>
-                <a href="http://www.sotcarga.com/remesasymensajes/" id="menú-icon-1">
-                  Clientes
+                <a href="https://trazabilidad-rust.vercel.app/" id="menú-icon-1" target="_blank" rel="noopener noreferrer">
+                  Cliente Corporativo
                 </a>
               </li>
               <li>
@@ -60,6 +60,11 @@ export default function Header() {
             <ul>
               <li>
                 <Link href="/">Inicio</Link>
+              </li>
+              <li>
+                <a href="https://trazabilidad-rust.vercel.app/" target="_blank" rel="noopener noreferrer">
+                  Cliente Corporativo
+                </a>
               </li>
               <li>
                 <Link href="/contactos">Contactos</Link>

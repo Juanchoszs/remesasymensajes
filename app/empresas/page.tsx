@@ -34,11 +34,19 @@ export default function EmpresasPage() {
         body: JSON.stringify(formData),
       })
 
-      const result = await response.json().catch(() => ({}))
+      let result;
+      const responseText = await response.text();
+      
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Error parsing JSON response:', responseText);
+        result = { message: `Error del servidor: ${response.status} ${response.statusText}` };
+      }
 
       if (!response.ok) {
-        console.error('Error response:', result)
-        throw new Error(result.message || `Error al enviar el formulario (${response.status})`)
+        console.error('Error response:', result);
+        throw new Error(result.message || result.error || `Error al enviar el formulario (${response.status})`);
       }
 
       setSubmitStatus({

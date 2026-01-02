@@ -28,7 +28,7 @@ const sections: AccordionSection[] = [
     title: "Empresas",
     videoSrc: "/video-empresa-logistica-2.mp4", // VIDEO: static/img/fondos/video1.mp4
     options: [
-      { label: "Cliente Corporativo", href: "http://www.sotcarga.com/remesasymensajes/", external: true },
+      { label: "Cliente Corporativo", href: "https://trazabilidad-rust.vercel.app/", external: true },
       { label: "¿Quieres Enviar con Nosotros?", href: "/empresas" },
     ],
   },
